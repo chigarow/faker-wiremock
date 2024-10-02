@@ -7,10 +7,11 @@ import net.datafaker.Faker;
 
 public class RandomHelper extends HandlebarsHelper<Object> {
 
-  private Faker faker; // Field added
+  private static final Locale DEFAULT_LOCALE = Locale.US; // Default to en-US
+  private Faker faker;
 
   public RandomHelper() {
-    this.faker = new Faker(); // Initialize with default locale
+    this.faker = new Faker(DEFAULT_LOCALE); // Initialize with default locale (en-US)
   }
 
   @Override
@@ -27,6 +28,9 @@ public class RandomHelper extends HandlebarsHelper<Object> {
         // Update the Faker instance with the specified locale
         Locale locale = new Locale.Builder().setLanguageTag(localePart.replace('_', '-')).build();
         this.faker = new Faker(locale);
+      } else {
+        // Use default locale if no locale specification is found
+        this.faker = new Faker(DEFAULT_LOCALE);
       }
 
       return faker.expression("#{" + contextString + "}");
