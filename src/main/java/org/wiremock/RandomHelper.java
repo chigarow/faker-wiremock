@@ -7,11 +7,11 @@ import net.datafaker.Faker;
 
 public class RandomHelper extends HandlebarsHelper<Object> {
 
-  private static final Locale DEFAULT_LOCALE = Locale.US; // Default to en-US
+  private static final String DEFAULT_LOCALE = "id-ID"; // Default locale set to id-ID
   private Faker faker;
 
   public RandomHelper() {
-    this.faker = new Faker(DEFAULT_LOCALE); // Initialize with default locale (en-US)
+    this.faker = new Faker(new Locale(DEFAULT_LOCALE)); // Initialize with default locale
   }
 
   @Override
@@ -23,14 +23,20 @@ public class RandomHelper extends HandlebarsHelper<Object> {
       if (contextString.contains(".")) {
         String[] parts = contextString.split("\\.", 2);
         String localePart = parts[0];
-        contextString = parts[1];
+        String expressionPart = parts[1];
 
-        // Update the Faker instance with the specified locale
-        Locale locale = new Locale.Builder().setLanguageTag(localePart.replace('_', '-')).build();
-        this.faker = new Faker(locale);
+        if (localePart.matches("[a-zA-Z]{2}-[a-zA-Z]{2}")) {
+          // If locale is provided (e.g., id-ID, th-TH), use it
+          Locale locale = new Locale.Builder().setLanguageTag(localePart.replace('_', '-')).build();
+          this.faker = new Faker(locale);
+          contextString = expressionPart; // Use only the expression part for Faker
+        } else {
+          // If the first part is not a valid locale, assume it's part of the expression
+          this.faker = new Faker(new Locale(DEFAULT_LOCALE)); // Reset to default locale
+        }
       } else {
-        // Use default locale if no locale specification is found
-        this.faker = new Faker(DEFAULT_LOCALE);
+        // No locale specified, use default locale
+        this.faker = new Faker(new Locale(DEFAULT_LOCALE));
       }
 
       return faker.expression("#{" + contextString + "}");

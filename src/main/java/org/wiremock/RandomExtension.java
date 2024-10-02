@@ -16,6 +16,6 @@ public class RandomExtension implements TemplateHelperProviderExtension {
 
   @Override
   public String getName() {
-    return "faker-helper";
+    return "faker-helper-custom-2.1";
   }
 }
